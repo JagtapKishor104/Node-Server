@@ -10,7 +10,6 @@ const EmployeeModel = require('./model/employee');
 const app = express();
 app.use(cors());
 app.use(bodyparser.json());
-
 // Database Connnection 
 
 mongoose.connect(process.env.mongodburl, { useNewUrlParser: true }, (err) => {
@@ -195,7 +194,8 @@ app.put('/employee/:id', async (req, res) => {
 });
 
 // server Address
-const PORT = process.env.PORT | 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`server running ... ${PORT}`);
 });
+app.set("port",PORT)
