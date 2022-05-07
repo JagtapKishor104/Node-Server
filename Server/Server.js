@@ -42,7 +42,7 @@ app.get('/employee', async (req, res) => {
 
 // get data by id
 app.get('/employee/:id', async (req, res) => {
-    console.log('employee id',req.params.id );
+    console.log('employee id', req.params.id);
     if (req.params.id) {
         const chkid = mongoose.isValidObjectId(req.params.id);
         if (chkid === true) {
@@ -50,14 +50,14 @@ app.get('/employee/:id', async (req, res) => {
             if (employee_id_data == null) {
                 res.send({
                     msg: 'single data not data',
-                    response:404,
+                    response: 404,
                     // result: employee_id_data
                 })
             }
             else {
                 res.send({
-                    msg: "single data ",
-                    response:200,
+                    msg: "employee single data ",
+                    response: 200,
                     result: employee_id_data
                 });
             }
@@ -68,6 +68,11 @@ app.get('/employee/:id', async (req, res) => {
             })
         }
     }
+    else {
+        res.send({
+            msg: "employee id Not Generated"
+        })
+    }
 });
 
 
@@ -76,26 +81,25 @@ app.post('/employee', async (req, res) => {
     console.log(req.body, 'employee postdata');
     const chkdataexit = await EmployeeModel.findOne({ $or: [{ uemail: req.body.email }, { umobile: req.body.mobile }] });
     if (chkdataexit) {
-        if(chkdataexit.uemail === req.body.email && chkdataexit.umobile === req.body.mobile)
-        {
+        if (chkdataexit.uemail === req.body.email && chkdataexit.umobile === req.body.mobile) {
             res.send({
-                msg:"Mobile number and Email already exists"
+                msg: "Mobile number and Email already exists"
             })
-        } else 
-        if(chkdataexit.uemail === req.body.email) {
-            res.send({
-                msg: "email id already exits"
-            });
-        }
-  
-        else
-        if (chkdataexit.umobile === req.body.mobile) {
-            res.send({
-                msg: "mobile number already exits"
-            });
-        }
-      
-     
+        } else
+            if (chkdataexit.uemail === req.body.email) {
+                res.send({
+                    msg: "email id already exits"
+                });
+            }
+
+            else
+                if (chkdataexit.umobile === req.body.mobile) {
+                    res.send({
+                        msg: "mobile number already exits"
+                    });
+                }
+
+
     }
     else {
         // save db 
@@ -122,7 +126,37 @@ app.post('/employee', async (req, res) => {
     }
 });
 
+// delete single data by using _id
+app.delete('/employee/:id', async (req, res) => {
 
+    console.log('remove employee', req.params.id);
+
+    const chkvalidid = mongoose.isValidObjectId(req.params.id);
+    if (chkvalidid === true) {
+        const iddata = await EmployeeModel.deleteOne({ _id: req.params.id });
+        if (iddata.deletedCount === 1) {
+            res.send({
+                msg: "employee removed",
+                response: 200
+            });
+        }
+
+
+        else {
+            res.send({
+                msg: "employee not found",
+                response: 404,
+            });
+        }
+
+    } else {
+        res.send({
+            msg: "invalid id please enter valid id"
+        });
+    }
+
+
+});
 
 
 
