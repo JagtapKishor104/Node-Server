@@ -1,3 +1,5 @@
+// git remote add origin https://github.com/JagtapKishor104/Node-Server.git
+
 require('dotenv').config();
 
 const express = require('express');
@@ -24,19 +26,105 @@ mongoose.connect(process.env.mongodburl, { useNewUrlParser: true }, (err) => {
 app.get('/employee', async (req, res) => {
     console.log('employee getdata');
     const data = await EmployeeModel.find();
-    if (data.length>0) {
+    if (data.length > 0) {
         res.send({
             msg: "all user data",
-            response:200,
+            response: 200,
             result: data
         });
     } else {
         res.send({
             msg: "No Data Found",
-            response:404
+            response: 404
         });
     }
 });
+
+// get data by id
+app.get('/employee/:id', async (req, res) => {
+    console.log('employee id',req.params.id );
+    if (req.params.id) {
+        const chkid = mongoose.isValidObjectId(req.params.id);
+        if (chkid === true) {
+            const employee_id_data = await EmployeeModel.findById({ _id: req.params.id });
+            if (employee_id_data == null) {
+                res.send({
+                    msg: 'single data not data',
+                    response:404,
+                    // result: employee_id_data
+                })
+            }
+            else {
+                res.send({
+                    msg: "single data ",
+                    response:200,
+                    result: employee_id_data
+                });
+            }
+        }
+        else {
+            res.send({
+                msg: "invalid user id"
+            })
+        }
+    }
+});
+
+
+// post data to Mongodb Database
+app.post('/employee', async (req, res) => {
+    console.log(req.body, 'employee postdata');
+    const chkdataexit = await EmployeeModel.findOne({ $or: [{ uemail: req.body.email }, { umobile: req.body.mobile }] });
+    if (chkdataexit) {
+        if(chkdataexit.uemail === req.body.email && chkdataexit.umobile === req.body.mobile)
+        {
+            res.send({
+                msg:"Mobile number and Email already exists"
+            })
+        } else 
+        if(chkdataexit.uemail === req.body.email) {
+            res.send({
+                msg: "email id already exits"
+            });
+        }
+  
+        else
+        if (chkdataexit.umobile === req.body.mobile) {
+            res.send({
+                msg: "mobile number already exits"
+            });
+        }
+      
+     
+    }
+    else {
+        // save db 
+        const data = new EmployeeModel(
+            {
+                ufname: req.body.fname,
+                ulname: req.body.lname,
+                uemail: req.body.email,
+                umobile: req.body.mobile,
+                usalary: req.body.salary
+            }
+        );
+        data.save((err, result) => {
+            if (err) {
+                console.log('create db failed', err);
+            }
+            else {
+                res.send({
+                    msg: 'employee data created',
+                    data: result
+                });
+            }
+        });
+    }
+});
+
+
+
+
 
 // server Address
 const PORT = process.env.PORT | 3000;
