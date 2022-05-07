@@ -158,7 +158,35 @@ app.delete('/employee/:id', async (req, res) => {
 
 });
 
+// 
+// update data using _id
+app.put('/employee/:id', async (req, res) => {
+    console.log(req.params.id)
+    const updatedata = await EmployeeModel.updateOne({ _id: req.params.id }, {
+        $set:
+        {
+            uemail: req.body.email,
+            ufname: req.body.fname,
+            ulname: req.body.lname,
+            umobile: req.body.mobile,
+            usalary: req.body.salary
+        }
+    });
 
+    if (updatedata.modifiedCount===1) {
+        res.send({
+            msg: "data updated",
+            updatedata:updatedata.modifiedCount
+            });
+    }
+    else
+    {
+        res.send({
+            msg:"Value remain Same"
+        })
+    }
+
+});
 
 // server Address
 const PORT = process.env.PORT | 3000;
