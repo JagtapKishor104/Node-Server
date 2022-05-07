@@ -40,6 +40,12 @@ app.get('/employee', async (req, res) => {
     }
 });
 
+app.get('/', (req, res) => {
+    res
+      .status(200)
+      .send('Hello server is running')
+      .end();
+  });
 // get data by id
 app.get('/employee/:id', async (req, res) => {
     console.log('employee id', req.params.id);
